@@ -1,12 +1,12 @@
 const { ObjectId } = require('mongodb');
 
-class noteService {
+class bookService {
     constructor(client) {
-        this.Note = client.db().collection('books');
+        this.Book = client.db().collection('books');
     }
 
-    extractNoteData(payload) {
-        const note = {
+    extractBookData(payload) {
+        const book = {
             linkImage: payload.linkImage,
             linkBook: payload.linkBook,
             author: payload.author,
@@ -15,16 +15,16 @@ class noteService {
             important: payload.important,
         };
 
-        Object.keys(note).forEach(
-            (key) => note[key] === undefined && delete note[key]
+        Object.keys(book).forEach(
+            (key) => book[key] === undefined && delete book[key]
         );
-        return note;
+        return book;
     }
     async create(payload) {
-        const note = this.extractNoteData(payload);
-        const result = await this.Note.findOneAndUpdate(
-            note,
-            { $set: { important: note.important === true } },
+        const book = this.extractBookData(payload);
+        const result = await this.Book.findOneAndUpdate(
+            book,
+            { $set: { important: book.important === true } },
             { returnDocument: "after", upsert: true }
         );
         return result.value;
@@ -33,7 +33,7 @@ class noteService {
 
 
     async find(filter) {
-        const cursor = await this.Note.find(filter);
+        const cursor = await this.Book.find(filter);
         return await cursor.toArray();
     }
 
@@ -44,7 +44,7 @@ class noteService {
     }
 
     async findById(id) {
-        return await this.Note.findOne({
+        return await this.Book.findOne({
             _id: ObjectId.isValid(id) ? new ObjectId(id) : null,
         });
     }
@@ -53,8 +53,8 @@ class noteService {
         const filter = {
             _id: ObjectId.isValid(id) ? new ObjectId(id) : null,
         };
-        const update = this.extractNoteData(payload);
-        const result = await this.Note.findOneAndUpdate(
+        const update = this.extractBookData(payload);
+        const result = await this.Book.findOneAndUpdate(
             filter,
             { $set: update },
             { returnDocument: "after" }
@@ -64,7 +64,7 @@ class noteService {
 
 
     async delete(id) {
-        const result = await this.Note.findOneAndDelete({
+        const result = await this.Book.findOneAndDelete({
             _id: ObjectId.isValid(id) ? new ObjectId(id) : null,
         });
         return result.value;
@@ -75,10 +75,10 @@ class noteService {
     }
 
     async deleteAll() {
-        const result = await this.Note.deleteMany({});
+        const result = await this.Book.deleteMany({});
         return result.deletedCount;
     }
 
 }
 
-module.exports = noteService;
+module.exports = bookService;

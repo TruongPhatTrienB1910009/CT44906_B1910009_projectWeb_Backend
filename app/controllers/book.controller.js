@@ -1,6 +1,6 @@
 const { ObjectId } = require("mongodb");
 const ApiError = require("../api-error");
-const NoteService = require("../services/book.service");
+const BookService = require("../services/book.service");
 const MongoDB = require("../utils/mongodb.util");
 
 exports.create = async (req, res, next) => {
@@ -9,12 +9,12 @@ exports.create = async (req, res, next) => {
     }
 
     try {
-        const noteService = new NoteService(MongoDB.client);
-        const document = await noteService.create(req.body);
+        const bookService = new BookService(MongoDB.client);
+        const document = await bookService.create(req.body);
         return res.send(document);
     } catch (error) {
         return next(
-            new ApiError(500, "An error occurred while creating the note")
+            new ApiError(500, "An error occurred while creating the book")
         );
     }
 }
@@ -22,16 +22,16 @@ exports.create = async (req, res, next) => {
 exports.findAll = async (req, res, next) => {
     let document = [];
     try {
-        const noteService = new NoteService(MongoDB.client);
+        const bookService = new BookService(MongoDB.client);
         const { name } = req.query;
         if (name) {
-            document = await noteService.findByName(name);
+            document = await bookService.findByName(name);
         } else {
-            document = await noteService.find({});
+            document = await bookService.find({});
         }
     } catch (error) {
         return next(
-            new ApiError(500, "An error occurred while retrieving the notes")
+            new ApiError(500, "An error occurred while retrieving the books")
         );
     }
 
@@ -40,15 +40,15 @@ exports.findAll = async (req, res, next) => {
 
 exports.findOne = async (req, res, next) => {
     try {
-        const noteService = new NoteService(MongoDB.client);
-        const document = await noteService.findById(req.params.id);
+        const bookService = new BookService(MongoDB.client);
+        const document = await bookService.findById(req.params.id);
         if (!document) {
-            return next(new ApiError(404, "note not found"));
+            return next(new ApiError(404, "book not found"));
         }
         return res.send(document);
     } catch (error) {
         return next(
-            new ApiError(500, `Error retrieving note with id=${req.params.id}`)
+            new ApiError(500, `Error retrieving book with id=${req.params.id}`)
         )
     }
 }
@@ -59,12 +59,12 @@ exports.update = async (req, res, next) => {
     }
 
     try {
-        const noteService = new NoteService(MongoDB.client);
-        const document = await noteService.update(req.params.id, req.body);
+        const bookService = new BookService(MongoDB.client);
+        const document = await bookService.update(req.params.id, req.body);
         if (!document) {
-            return next(new ApiError(404, "note not found"));
+            return next(new ApiError(404, "book not found"));
         }
-        return res.send({ message: "note was updated successfully" });
+        return res.send({ message: "book was updated successfully" });
     } catch (error) {
         return next(
             new ApiError(500, `Error updating note with id=${req.params.id}`)
@@ -74,41 +74,41 @@ exports.update = async (req, res, next) => {
 
 exports.delete = async (req, res, next) => {
     try {
-        const noteService = new NoteService(MongoDB.client);
-        const document = await noteService.delete(req.params.id);
+        const bookService = new BookService(MongoDB.client);
+        const document = await bookService.delete(req.params.id);
         if (!document) {
-            return next(new ApiError(404, "note not found"));
+            return next(new ApiError(404, "book not found"));
         }
-        return res.send({ message: "note was deleted successfully" });
+        return res.send({ message: "book was deleted successfully" });
     } catch (error) {
         return next(
-            new ApiError(500, `Could not delete note with id=${req.params.id}`)
+            new ApiError(500, `Could not delete book with id=${req.params.id}`)
         );
     }
 }
 
 exports.deleteAll = async (req, res, next) => {
     try {
-        const noteService = new NoteService(MongoDB.client);
-        const deletedCount = await noteService.deleteAll();
+        const bookService = new BookService(MongoDB.client);
+        const deletedCount = await bookService.deleteAll();
         return res.send({
-            message: `${deletedCount} notes were deleted successfully`,
+            message: `${deletedCount} books were deleted successfully`,
         });
     } catch (error) {
         return next(
-            new ApiError(500, "An error occurred while removing all notes")
+            new ApiError(500, "An error occurred while removing all books")
         );
     }
 }
 
 exports.findImportant = async (req, res, next) => {
     try {
-        const noteService = new NoteService(MongoDB.client);
-        const document = await noteService.findImportant();
+        const bookService = new BookService(MongoDB.client);
+        const document = await bookService.findImportant();
         return res.send(document);
     } catch (error) {
         return next(
-            new ApiError(500, "An error occurred while retrieving favorite notes")
+            new ApiError(500, "An error occurred while retrieving favorite books")
         )
     }
 }
